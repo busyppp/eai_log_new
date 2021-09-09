@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+    <title>pgsql 조회 페이지</title>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" media="all" />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <script src="http://code.jquery.com/ui/1.8.18/jquery-ui.min.js" type="text/javascript"></script>
+    <script>
+    $(function() {
+        var dates = $( "#startdate, #enddate " ).datepicker({
+        prevText: '이전 달',
+        nextText: '다음 달',
+        monthNames: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+        monthNamesShort: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+        dayNames: ['일','월','화','수','목','금','토'],
+        dayNamesShort: ['일','월','화','수','목','금','토'],
+        dayNamesMin: ['일','월','화','수','목','금','토'],
+        dateFormat: 'yymmdd',
+        showMonthAfterYear: true,
+        yearSuffix: '년',
+        maxDate:'+30d',
+        onSelect: function( selectedDate ) {
+            var option = this.id == "startdate" ? "minDate" : "maxDate",
+            instance = $( this ).data( "datepicker" ),
+            date = $.datepicker.parseDate(instance.settings.dateFormat || $.datepicker._defaults.dateFormat, selectedDate, instance.settings );
+            dates.not( this ).datepicker( "option", option, date );
+        }
+        });
+
+        //초기값을 오늘 날짜로 설정
+    $('#startdate').datepicker('setDate', '-2D'); //(-1D:하루전, -1M:한달전, -1Y:일년전), (+1D:하루후, +1M:한달후, +1Y:일년후)
+    $('#enddate').datepicker('setDate', 'today'); //(-1D:하루전, -1M:한달전, -1Y:일년전), (+1D:하루후, +1M:한달후, +1Y:일년후)
+    });
+    </script>
+
+    <style>
+      div.row {
+        width: 100%;
+        height: 70%;
+        border: 1px solid #003458;
+      }
+      div.left {
+        width: 50%;
+        height: 100%;
+        float: left;
+        box-sizing: border-box;
+        border: 1px solid black;
+      }
+      div.left1 {
+        width: 100%;
+        height: 10%;
+        box-sizing: border-box;
+      }
+      div.left2 {
+        width: 100%;
+        height: 35%;
+        box-sizing: border-box;
+        overflow: auto;
+      }
+      div.left3 {
+        width: 100%;
+        height: 55%;
+        box-sizing: border-box;
+        overflow: auto;
+      }
+      div.right {
+        width: 50%;
+        height: 100%;
+        float: right;
+        box-sizing: border-box;
+        background: #ece6cc;
+        border: 1px solid black;
+        overflow: auto;
+        text-align: left;
+      }
+
+    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+</head>
+
+<body>
+<div class="row">
+    <div class="left">
+        <div class="left1">
+            <h4>조회 조건</h4>
+            <form action="/" method="POST">
+                <label for="tran_id">Tran_ID:</label>
+                <input type="text" name="tran_id"/>
+                <label for="if_id">IF_ID:</label>
+                <input type="text" name="if_id"/>
+
+                <label for="date">Date:</label>
+                <input type="text" name="startdate" id="startdate"> ~
+                <input type="text" name="enddate" id="enddate">
+
+                <input type="submit" value="search"/>
+            </form>
+        </div>
+        <br>
+        <div class="left2">
+            mon table 조회
+            <table class ="table table-hover table-striprd text-left" style="border:1px solid;">
+                <thead>
+                <tr>
+                    <th>Tran_ID</th>
+                    <th>IF_ID</th>
+                    <th>STEP</th>
+                    <th>PROC_TIME</th>
+                    <th>APPNODE</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for i in mon_data_list %}
+                <tr>
+                    <td>{{ i[0] }}</td>
+                    <td>{{ i[1] }}</td>
+                    <td>{{ i[2] }}</td>
+                    <td>{{ i[4] }}</td>
+                    <td>{{ i[19] }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <div class="left3">
+            log table 조회
+            <table class ="table table-hover table-striprd text-left" style="border:1px solid;">
+                <thead>
+                <tr>
+                    <th>Tran_ID</th>
+                    <th>IF_ID</th>
+                    <th>STEP</th>
+                    <th>PROC_TIME</th>
+                    <th>APPNODE</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for i in log_data_list %}
+                <tr>
+                    <td>{{ i[0] }}</td>
+                    <td>{{ i[1] }}</td>
+                    <td>{{ i[2] }}</td>
+                    <td>{{ i[4] }}</td>
+                    <td>{{ i[16] }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="right">
+        nosql 조회 영역
+        <table class ="table table-hover table-striprd text-left" style="border:1px solid ">
+            <thead>
+            <tr>
+                <th>Tran_ID</th>
+                <th>Step</th>
+                <th>Datas</th>
+                <th>Error_Msg</th>
+                <th>Error_Trace</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for i in nosql_data_list %}
+            <tr>
+                <td>{{ i.tran_id }}</td>
+                <td>{{ i.step }}</td>
+                <td>{{ i.datas }}</td>
+                <td>{{ i.error_msg }}</td>
+                <td>{{ i.error_trace }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" integrity="sha384-eMNCOe7tC1doHpGoWe/6oMVemdAVTMs2xqW4mwXrXsW0L84Iytr2wi5v2QjrP/xp" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js" integrity="sha384-cn7l7gDp0eyniUwwAZgrzD06kc/tftFf19TOAs2zVinnD/C7E91j9yyk5//jjpt/" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+</body>
+</html>
